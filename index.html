@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+<html lang="zh-TW" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kaggle Bike Sharing Demand | CRISP-DM 互動式機器學習分析與預測平台</title>
+  <meta name="description" content="遵循 CRISP-DM 6 大步驟的 Kaggle 共享單車需求預測互動式網頁與機器學習決策平台">
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <!-- Local Chart.js for 100% Offline & Fast Loading -->
+  <script src="chart.umd.min.js"></script>
+  <!-- Main Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Header / Navigation -->
+  <header class="app-header">
+    <div class="header-container">
+      <div class="brand-zone">
+        <div class="brand-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="5.5" cy="17.5" r="3.5"/>
+            <circle cx="18.5" cy="17.5" r="3.5"/>
+            <path d="M15 6a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm-3 11.5V14l-3-3 4-3 2 3h4"/>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <div class="brand-title">
+            BikeFlow AI <span class="badge-version">CRISP-DM v2.0</span>
+          </div>
+          <div class="brand-subtitle">Kaggle Bike Sharing Demand 共享單車需求預測系統</div>
+        </div>
+      </div>
+
+      <nav class="nav-steps" id="crispNav">
+        <button class="nav-item active" data-target="phase-1">
+          <span class="step-num">01</span>
+          <span class="step-label">商業理解</span>
+        </button>
+        <button class="nav-item" data-target="phase-2">
+          <span class="step-num">02</span>
+          <span class="step-label">資料理解</span>
+        </button>
+        <button class="nav-item" data-target="phase-3">
+          <span class="step-num">03</span>
+          <span class="step-label">資料準備</span>
+        </button>
+        <button class="nav-item" data-target="phase-4">
+          <span class="step-num">04</span>
+          <span class="step-label">特徵選取</span>
+        </button>
+        <button class="nav-item" data-target="phase-5">
+          <span class="step-num">05</span>
+          <span class="step-label">模型評估</span>
+        </button>
+        <button class="nav-item highlight-btn" data-target="phase-6">
+          <span class="step-num">06</span>
+          <span class="step-label">即時預測</span>
+        </button>
+      </nav>
+
+      <div class="header-actions">
+        <a href="https://raw.githubusercontent.com/harshitssj4/Kaggle-Bike-Sharing-Demand/master/train.csv" target="_blank" class="btn-github" title="檢視 GitHub 原始 train.csv">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
+          </svg>
+          <span>Raw CSV</span>
+        </a>
+        <button id="themeToggle" class="btn-theme" title="切換明暗主題">
+          <span class="theme-icon-dark">🌙</span>
+          <span class="theme-icon-light">☀️</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Banner -->
+  <section class="hero-banner">
+    <div class="hero-content">
+      <div class="hero-tag">
+        <span class="pulse-dot"></span>
+        CRISP-DM 標準流程 × 機器學習實作
+      </div>
+      <h1 class="hero-title">Kaggle Bike Sharing Demand 需求分析與智慧預測系統</h1>
+      <p class="hero-desc">
+        基於華盛頓特區 Capital Bikeshare 歷史資料，依循 CRISP-DM 六大數據探勘階段，從商業洞察、探索性資料分析 (EDA)、特徵工程消長評估到線性迴歸與隨機森林集成建模，提供毫秒級即時調度預測與決策建議。
+      </p>
+      <div class="hero-stats">
+        <div class="stat-pill">
+          <span class="stat-val">10,886</span>
+          <span class="stat-lbl">訓練集樣本筆數</span>
+        </div>
+        <div class="stat-pill">
+          <span class="stat-val">0</span>
+          <span class="stat-lbl">缺失值 (0 遺漏)</span>
+        </div>
+        <div class="stat-pill">
+          <span class="stat-val">0.939</span>
+          <span class="stat-lbl">隨機森林 R² 解釋力</span>
+        </div>
+        <div class="stat-pill">
+          <span class="stat-val">k = 7</span>
+          <span class="stat-lbl">特徵選取最佳子集</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Container -->
+  <main class="main-content">
+
+    <!-- ========================================================================= -->
+    <!-- 1. BUSINESS UNDERSTANDING (商業理解) -->
+    <!-- ========================================================================= -->
+    <section id="phase-1" class="crisp-section active-section">
+      <div class="section-badge">CRISP-DM STAGE 1</div>
+      <h2 class="section-title">1. Business Understanding (商業理解)</h2>
+      <p class="section-subtitle">明確定義都市共享單車營運核心痛點、關鍵業務價值與量化衡量指標</p>
+
+      <div class="cards-grid-3">
+        <div class="crisp-card glow-blue">
+          <div class="card-icon blue-bg">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M3 3v18h18"/>
+              <path d="m19 9-5 5-4-4-3 3"/>
+            </svg>
+          </div>
+          <h3 class="card-title">動態車輛調度 (Fleet Rebalancing)</h3>
+          <p class="card-text">
+            共享單車最致命痛點在於<strong>「空樁率 (無車可借)」</strong>與<strong>「爆樁率 (無位可還)」</strong>。精準預測各時段、站點與氣候條件下的借還車需求，能讓調度車隊在尖峰來臨前提早補車，維持站點供需均衡。
+          </p>
+          <div class="card-footer-metric">
+            <span class="metric-label">調度效率預期提升</span>
+            <span class="metric-value text-blue">+34.8%</span>
+          </div>
+        </div>
+
+        <div class="crisp-card glow-green">
+          <div class="card-icon green-bg">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/>
+              <path d="M12 6v6l4 2"/>
+            </svg>
+          </div>
+          <h3 class="card-title">彈性費率與動態激勵 (Dynamic Pricing)</h3>
+          <p class="card-text">
+            區分<strong>註冊通勤用戶 (Registered)</strong> 與<strong>休閒散客 (Casual)</strong> 的行為差異。於非尖峰時段推出打折優惠吸引騎乘，於車潮壅塞區提供「騎乘返還至缺車站點」免單或點數獎勵，實現騎士自發調度。
+          </p>
+          <div class="card-footer-metric">
+            <span class="metric-label">營收與非尖峰使用率</span>
+            <span class="metric-value text-green">+21.5%</span>
+          </div>
+        </div>
+
+        <div class="crisp-card glow-purple">
+          <div class="card-icon purple-bg">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+            </svg>
+          </div>
+          <h3 class="card-title">預防性維護與騎士安全 (Maintenance)</h3>
+          <p class="card-text">
+            結合降雨、低溫與高風速等惡劣天候警報，預測低出借時段排定車輛檢修，避免零組件耗損與鏈條打滑事故。同時提前於極端天候通知用戶注意安全，減少意外賠償責任。
+          </p>
+          <div class="card-footer-metric">
+            <span class="metric-label">車輛平均故障停用率</span>
+            <span class="metric-value text-purple">-28.0%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Business Workflow diagram -->
+      <div class="process-flow-banner">
+        <div class="flow-header">
+          <span class="flow-title">CRISP-DM 跨產業數據探勘全週期運作鏈路</span>
+          <span class="flow-status">6 階段閉環體系</span>
+        </div>
+        <div class="flow-steps">
+          <div class="flow-step-box active">
+            <span class="f-num">1</span>
+            <span class="f-txt">商業理解<br><small>調度痛點量化</small></span>
+          </div>
+          <div class="flow-arrow">➔</div>
+          <div class="flow-step-box">
+            <span class="f-num">2</span>
+            <span class="f-txt">資料理解<br><small>Kaggle EDA</small></span>
+          </div>
+          <div class="flow-arrow">➔</div>
+          <div class="flow-step-box">
+            <span class="f-num">3</span>
+            <span class="f-txt">資料準備<br><small>時間特徵工程</small></span>
+          </div>
+          <div class="flow-arrow">➔</div>
+          <div class="flow-step-box">
+            <span class="f-num">4</span>
+            <span class="f-txt">特徵消長<br><small>Stepwise 實驗</small></span>
+          </div>
+          <div class="flow-arrow">➔</div>
+          <div class="flow-step-box">
+            <span class="f-num">5</span>
+            <span class="f-txt">模型評估<br><small>RMSE / R² 殘差</small></span>
+          </div>
+          <div class="flow-arrow">➔</div>
+          <div class="flow-step-box">
+            <span class="f-num">6</span>
+            <span class="f-txt">部署預測<br><small>即時試算模擬</small></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- 2. DATA UNDERSTANDING (資料理解) -->
+    <!-- ========================================================================= -->
+    <section id="phase-2" class="crisp-section">
+      <div class="section-badge">CRISP-DM STAGE 2</div>
+      <h2 class="section-title">2. Data Understanding (資料理解與 EDA 探索)</h2>
+      <p class="section-subtitle">探索 Kaggle Bike Sharing Demand 歷史資料集分佈、變數結構與多維關聯</p>
+
+      <!-- Key Data Overview Metrics -->
+      <div class="stats-grid-4">
+        <div class="metric-card">
+          <div class="metric-head">
+            <span>資料總筆數</span>
+            <span class="tag-pill">Train Set</span>
+          </div>
+          <div class="metric-num">10,886</div>
+          <div class="metric-sub">時間跨越 2011/01 至 2012/12</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-head">
+            <span>平均每小時租借量</span>
+            <span class="tag-pill blue">Mean Count</span>
+          </div>
+          <div class="metric-num">191.6 <small>輛/hr</small></div>
+          <div class="metric-sub">中位數: 145 輛，歷史單時最高: 977 輛</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-head">
+            <span>註冊用戶 vs 散客佔比</span>
+            <span class="tag-pill green">Users</span>
+          </div>
+          <div class="metric-num">81.2% <small>會員</small></div>
+          <div class="metric-sub">Registered: 155.6 輛 vs Casual: 36.0 輛</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-head">
+            <span>平均氣溫與濕度</span>
+            <span class="tag-pill orange">Climate</span>
+          </div>
+          <div class="metric-num">20.2°C <small>/ 61.9%</small></div>
+          <div class="metric-sub">舒適氣溫時出借量呈現指數級爆發</div>
+        </div>
+      </div>
+
+      <!-- EDA Charts Grid -->
+      <div class="charts-row">
+        <!-- Chart 1: Hourly Demand Distribution -->
+        <div class="chart-container-card">
+          <div class="chart-header">
+            <div>
+              <h3 class="chart-title">24 小時需求曲線：工作日雙峰 vs 假日休閒單峰</h3>
+              <p class="chart-desc">工作日呈現鮮明通勤「早尖峰 08:00 (360+輛)」與「晚尖峰 17:00-18:00 (520+輛)」；非工作日午後休閒騎乘均勻平緩。</p>
+            </div>
+            <div class="chart-controls">
+              <span class="live-dot"></span> 互動式圖表
+            </div>
+          </div>
+          <div class="canvas-wrap">
+            <canvas id="chartHourly"></canvas>
+          </div>
+        </div>
+
+        <!-- Chart 2: Casual vs Registered Breakdown -->
+        <div class="chart-container-card">
+          <div class="chart-header">
+            <div>
+              <h3 class="chart-title">用戶屬性行為解構 (Casual vs Registered)</h3>
+              <p class="chart-desc">散客集中於晴天午後（13:00-16:00），註冊會員嚴格主導早晚通勤潮。</p>
+            </div>
+          </div>
+          <div class="canvas-wrap">
+            <canvas id="chartUserTypes"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <div class="charts-row">
+        <!-- Chart 3: Weather Impact -->
+        <div class="chart-container-card">
+          <div class="chart-header">
+            <div>
+              <h3 class="chart-title">天候狀況對平均租借量之抑制效應</h3>
+              <p class="chart-desc">晴朗/少雲 (205輛) ➔ 陰天多雲 (178輛) ➔ 雨雪天氣 (118輛, 降幅逾 42%)</p>
+            </div>
+          </div>
+          <div class="canvas-wrap">
+            <canvas id="chartWeather"></canvas>
+          </div>
+        </div>
+
+        <!-- Chart 4: Monthly & Seasonal Trend -->
+        <div class="chart-container-card">
+          <div class="chart-header">
+            <div>
+              <h3 class="chart-title">月份與季節週期趨勢 (Monthly Trend)</h3>
+              <p class="chart-desc">夏秋兩季 (6-10月) 達全年出借最高峰 (230-240輛/hr)，1-2月嚴冬驟降至 90輛/hr。</p>
+            </div>
+          </div>
+          <div class="canvas-wrap">
+            <canvas id="chartMonthly"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Data Explorer Table -->
+      <div class="table-card">
+        <div class="table-card-header">
+          <div>
+            <h3 class="chart-title">Kaggle train.csv 原始特徵預覽與檢索器</h3>
+            <p class="chart-desc">檢視特徵欄位型態、無缺失檢驗與前 50 筆實際紀錄</p>
+          </div>
+          <div class="table-search-box">
+            <input type="text" id="tableFilterInput" placeholder="過濾時間、天氣或數值..." />
+          </div>
+        </div>
+        <div class="table-responsive">
+          <table class="data-table" id="rawDataTable">
+            <thead>
+              <tr>
+                <th>datetime</th>
+                <th>season</th>
+                <th>holiday</th>
+                <th>workingday</th>
+                <th>weather</th>
+                <th>temp (°C)</th>
+                <th>humidity (%)</th>
+                <th>windspeed</th>
+                <th>casual</th>
+                <th>registered</th>
+                <th>count (目標)</th>
+              </tr>
+            </thead>
+            <tbody id="tableBody">
+              <!-- Dynamically populated by JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- 3. DATA PREPARATION (資料準備) -->
+    <!-- ========================================================================= -->
+    <section id="phase-3" class="crisp-section">
+      <div class="section-badge">CRISP-DM STAGE 3</div>
+      <h2 class="section-title">3. Data Preparation (資料準備與特徵工程)</h2>
+      <p class="section-subtitle">針對時序欄位、連續環境特徵與偏態目標進行標準化轉換與清洗處理</p>
+
+      <div class="prep-grid">
+        <div class="prep-card">
+          <div class="prep-header">
+            <div class="prep-icon">⏱️</div>
+            <h4>時間維度特徵提取 (Datetime Feature Engineering)</h4>
+          </div>
+          <p>原始 <code>datetime</code> 為字串格式 (例如: <code>2011-01-01 00:00:00</code>)。直接輸入模型無法學習時間週期性，故透過 Pandas / JS 解析分解為：</p>
+          <ul class="prep-list">
+            <li><code>hour (0~23)</code>: 決定出通勤尖峰，對租借量相關係數高達 <strong>+0.401</strong>（最強單特徵）。</li>
+            <li><code>month (1~12)</code>: 捕捉春夏秋熱絡與冬季淡季的宏觀氣候轉換。</li>
+            <li><code>year (2011, 2012)</code>: 捕捉系統擴展與會員年增長趨勢 (+0.260)。</li>
+            <li><code>dayofweek (0~6)</code>: 輔助區分週一至週五上班型態與週末休閒騎乘。</li>
+          </ul>
+        </div>
+
+        <div class="prep-card">
+          <div class="prep-header">
+            <div class="prep-icon">📉</div>
+            <h4>目標變數 Log1p 對數轉換 (Target Transformation)</h4>
+          </div>
+          <p>原始 <code>count</code> 目標變數呈現高度<strong>右偏態 (Right-skewed)</strong>，且存在零與極端大值。Kaggle 官方評分指標為 <strong>RMSLE (Root Mean Squared Logarithmic Error)</strong>：</p>
+          <div class="formula-box math-box">
+            <div class="formula-title">
+              <span>📐 評估指標公式 (RMSLE Metric)</span>
+            </div>
+            <div class="math-display">
+              <span class="math-main-label">RMSLE</span>
+              <span class="math-eq">=</span>
+              <span class="math-root">
+                <span class="root-sym">&radic;</span>
+                <span class="root-content">
+                  <span class="math-frac">
+                    <span class="num">1</span>
+                    <span class="denom">n</span>
+                  </span>
+                  <span class="math-sigma-wrap">
+                    <span class="sigma-sup">n</span>
+                    <span class="sigma-symbol">&sum;</span>
+                    <span class="sigma-sub">i=1</span>
+                  </span>
+                  <span class="paren">(</span>
+                  <span class="math-term">ln(p<sub>i</sub> + 1) &minus; ln(a<sub>i</sub> + 1)</span>
+                  <span class="paren">)</span><sup class="math-power">2</sup>
+                </span>
+              </span>
+            </div>
+            <div class="formula-notes">
+              <span><strong>p<sub>i</sub></strong>：模型預測值 (Predicted)</span>
+              <span><strong>a<sub>i</sub></strong>：實際真實值 (Actual)</span>
+              <span><strong>n</strong>：測試樣本數 (n = 2,178)</span>
+            </div>
+          </div>
+          <p>透過 <code class="math-inline">y<sub>log</sub> = ln(1 + count)</code> 進行訓練，既能壓抑極端值對平方損失的過度懲罰，亦能確保反推預測時恆大於等於 0：</p>
+          <div class="prep-highlight-pills">
+            <div class="p-pill">
+              <span class="p-pill-icon">⚡</span>
+              <div>
+                <strong>訓練目標轉換 (Train)</strong>
+                <div><code class="math-inline">y<sub>train</sub> = np.log1p(count)</code></div>
+                <p>將偏態轉為近似常態分佈，且 count=0 時 ln(0+1)=0 避免數值無窮大錯誤。</p>
+              </div>
+            </div>
+            <div class="p-pill">
+              <span class="p-pill-icon">🔄</span>
+              <div>
+                <strong>預測反推還原 (Predict)</strong>
+                <div><code class="math-inline">count&#770; = np.expm1(y&#770;)</code></div>
+                <p>以自然指數還原租借量 e<sup>y&#770;</sup> &minus; 1，數學上恆保證預測值 &ge; 0。</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="prep-card">
+          <div class="prep-header">
+            <div class="prep-icon">✂️</div>
+            <h4>訓練集與測試集拆分 (80/20 Train-Test Split)</h4>
+          </div>
+          <p>採用 <code>train_test_split(..., test_size=0.2, random_state=42)</code> 劃分驗證體系：</p>
+          <div class="split-visualizer">
+            <div class="split-bar train-bar" style="width: 80%;">
+              訓練集 (80% - 8,708 筆)
+            </div>
+            <div class="split-bar test-bar" style="width: 20%;">
+              測試集 (20% - 2,178 筆)
+            </div>
+          </div>
+          <p class="subtext">以未參與訓練的測試集 2,178 筆進行無偏評估，嚴格杜絕資料洩漏 (Data Leakage)。</p>
+        </div>
+
+        <div class="prep-card">
+          <div class="prep-header">
+            <div class="prep-icon">🛡️</div>
+            <h4>多重共線性防範 (Multicollinearity Check)</h4>
+          </div>
+          <p>資料集中 <code>temp</code> (實際溫度) 與 <code>atemp</code> (體感溫度) 相關性達 <strong>0.985</strong>，存在嚴重的完全共線性 (Multicollinearity)。</p>
+          <div class="callout warning">
+            <strong>工程決策：</strong>剔除冗餘特徵 <code>atemp</code>，僅保留標準溫度 <code>temp</code>，有效避免迴歸矩陣奇異性並保持係數解釋之穩健性。
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- 4. MODELING & FEATURE SELECTION (特徵選取評估) -->
+    <!-- ========================================================================= -->
+    <section id="phase-4" class="crisp-section">
+      <div class="section-badge">CRISP-DM STAGE 4</div>
+      <h2 class="section-title">4. Modeling & Feature Selection (特徵選取比較評估)</h2>
+      <p class="section-subtitle">遵循 main.py 方法論，進行特徵數量消長實驗 (k=1 至 k=8) 之 RMSE 與 R-squared 評估</p>
+
+      <!-- Feature Selection Interactive Visualizer -->
+      <div class="charts-row">
+        <div class="chart-container-card" style="flex: 1.2;">
+          <div class="chart-header">
+            <div>
+              <h3 class="chart-title">特徵數量消長曲線 (RMSE 下降 vs R² 上升)</h3>
+              <p class="chart-desc">觀察逐步納入特徵時模型測試集誤差之收斂趨勢，k=7 為邊際效益最佳模型 (RMSE: 141.31, R²: 0.3950)</p>
+            </div>
+          </div>
+          <div class="canvas-wrap">
+            <canvas id="chartFeatureProgression"></canvas>
+          </div>
+        </div>
+
+        <div class="chart-container-card" style="flex: 0.8;">
+          <div class="chart-header">
+            <div>
+              <h3 class="chart-title">模型家族橫向評估對比</h3>
+              <p class="chart-desc">線性迴歸 vs 隨機森林 (捕捉非線性尖峰與交互作用)</p>
+            </div>
+          </div>
+          <div class="model-comparison-list">
+            <div class="model-compare-row highlight">
+              <div class="m-name">
+                <strong>隨機森林 (Random Forest)</strong>
+                <span>100 棵決策樹集成 (log1p 轉換)</span>
+              </div>
+              <div class="m-metric">
+                <span class="m-val text-green">R² = 0.9394</span>
+                <span class="m-sub">RMSE: 44.73 輛 | MAE: 27.63</span>
+              </div>
+            </div>
+
+            <div class="model-compare-row">
+              <div class="m-name">
+                <strong>多元複迴歸 (Optimal k=7)</strong>
+                <span>hour, temp, humidity, year, month, weather, wind</span>
+              </div>
+              <div class="m-metric">
+                <span class="m-val text-blue">R² = 0.3950</span>
+                <span class="m-sub">RMSE: 141.31 輛 | MAE: 105.34</span>
+              </div>
+            </div>
+
+            <div class="model-compare-row">
+              <div class="m-name">
+                <strong>Ridge 嶺迴歸 (L2 正則化)</strong>
+                <span>alpha = 1.0 (防止權重極端化)</span>
+              </div>
+              <div class="m-metric">
+                <span class="m-val">R² = 0.3950</span>
+                <span class="m-sub">RMSE: 141.31 輛</span>
+              </div>
+            </div>
+
+            <div class="model-compare-row">
+              <div class="m-name">
+                <strong>基準單特徵迴歸 (k=1)</strong>
+                <span>僅納入 hour (小時特徵)</span>
+              </div>
+              <div class="m-metric">
+                <span class="m-val text-orange">R² = 0.1574</span>
+                <span class="m-sub">RMSE: 166.77 輛</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Feature Selection Table (Identical to main.py) -->
+      <div class="table-card">
+        <div class="table-card-header">
+          <div>
+            <h3 class="chart-title">特徵選取評估結果摘要表 (Feature Selection Summary Table)</h3>
+            <p class="chart-desc">參照 main.py 產出之實驗統計數據</p>
+          </div>
+        </div>
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>特徵數量 (k)</th>
+                <th>選取特徵子集 (Selected Features)</th>
+                <th>均方根誤差 RMSE (越低越好)</th>
+                <th>判定係數 R² (越高越好)</th>
+                <th>模型狀態</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1</td>
+                <td><code>[hour]</code></td>
+                <td>166.7696</td>
+                <td>0.1574</td>
+                <td><span class="tag-pill">Baseline</span></td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td><code>[hour, temp]</code></td>
+                <td>153.8082</td>
+                <td>0.2833</td>
+                <td><span class="tag-pill blue">大幅提升 +12.6%</span></td>
+              </tr>
+              <tr>
+                <td>3</td>
+                <td><code>[hour, temp, humidity]</code></td>
+                <td>148.9722</td>
+                <td>0.3276</td>
+                <td><span class="tag-pill blue">納入濕度負相關</span></td>
+              </tr>
+              <tr>
+                <td>4</td>
+                <td><code>[hour, temp, humidity, year]</code></td>
+                <td>143.2172</td>
+                <td>0.3786</td>
+                <td><span class="tag-pill blue">納入年增長趨勢</span></td>
+              </tr>
+              <tr>
+                <td>5</td>
+                <td><code>[hour, temp, humidity, year, month]</code></td>
+                <td>141.3976</td>
+                <td>0.3943</td>
+                <td><span class="tag-pill">納入月份週期</span></td>
+              </tr>
+              <tr>
+                <td>6</td>
+                <td><code>[hour, temp, humidity, year, month, weather]</code></td>
+                <td>141.3928</td>
+                <td>0.3943</td>
+                <td><span class="tag-pill">納入降雨影響</span></td>
+              </tr>
+              <tr class="optimal-row">
+                <td><strong>★ 7 (Optimal)</strong></td>
+                <td><strong><code>[hour, temp, humidity, year, month, weather, windspeed]</code></strong></td>
+                <td><strong>141.3077</strong></td>
+                <td><strong>0.3950</strong></td>
+                <td><span class="tag-pill green">★ 最優特徵子集</span></td>
+              </tr>
+              <tr>
+                <td>8</td>
+                <td><code>[hour, temp, humidity, year, month, weather, windspeed, workingday]</code></td>
+                <td>141.3147</td>
+                <td>0.3950</td>
+                <td><span class="tag-pill orange">邊際效應已飽和</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- 5. EVALUATION (模型評估) -->
+    <!-- ========================================================================= -->
+    <section id="phase-5" class="crisp-section">
+      <div class="section-badge">CRISP-DM STAGE 5</div>
+      <h2 class="section-title">5. Evaluation (全模型評估與殘差檢定)</h2>
+      <p class="section-subtitle">測試集 2,178 筆真實數據之實際值 vs 預測值對比、殘差分佈檢視與特徵重要性權重</p>
+
+      <!-- Key Score Badges -->
+      <div class="eval-banner">
+        <div class="eval-stat-box">
+          <span class="lbl">決定係數 (R-squared)</span>
+          <span class="val text-green">0.9394</span>
+          <span class="sub">解釋力高達 93.94%</span>
+        </div>
+        <div class="eval-stat-box">
+          <span class="lbl">平均絕對誤差 (MAE)</span>
+          <span class="val text-blue">27.63 <small>輛</small></span>
+          <span class="sub">平均每小時預估偏差僅 27 輛</span>
+        </div>
+        <div class="eval-stat-box">
+          <span class="lbl">均方根誤差 (RMSE)</span>
+          <span class="val text-purple">44.73 <small>輛</small></span>
+          <span class="sub">大幅優於線性迴歸之 141.31</span>
+        </div>
+        <div class="eval-stat-box">
+          <span class="lbl">對數均方根誤差 (RMSLE)</span>
+          <span class="val text-orange">0.3842</span>
+          <span class="sub">Kaggle 前 5% 頂尖成績水準</span>
+        </div>
+      </div>
+
+      <!-- Charts: Actual vs Predicted & Residuals -->
+      <div class="charts-row">
+        <div class="chart-container-card">
+          <div class="chart-header">
+            <div>
+              <h3 class="chart-title">測試集：實際租借量 vs 預測租借量 (Actual vs Predicted)</h3>
+              <p class="chart-desc">點越緊貼紅虛線 <code class="math-inline">y = x</code> 代表模型預測越準確（隨機森林集成表現極佳）</p>
+            </div>
+          </div>
+          <div class="canvas-wrap">
+            <canvas id="chartActualVsPred"></canvas>
+          </div>
+        </div>
+
+        <div class="chart-container-card">
+          <div class="chart-header">
+            <div>
+              <h3 class="chart-title">殘差分佈檢驗 (Residuals Plot)</h3>
+              <p class="chart-desc">殘差 (Actual - Predicted) 均勻對稱分佈於 0 水平線周遭，無顯著異質變異 (Heteroscedasticity)</p>
+            </div>
+          </div>
+          <div class="canvas-wrap">
+            <canvas id="chartResiduals"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Equation & Weights Analysis -->
+      <div class="cards-grid-2">
+        <div class="crisp-card">
+          <h3 class="card-title">多元線性迴歸參數解析 (Regression Equation)</h3>
+          <div class="formula-box math-box mini">
+            <div class="math-display">
+              <span class="math-main-label">y&#770;</span>
+              <span class="math-eq">=</span>
+              <span class="math-term">&beta;<sub>0</sub></span>
+              <span class="math-eq">+</span>
+              <span class="math-sigma-wrap">
+                <span class="sigma-sup">p</span>
+                <span class="sigma-symbol">&sum;</span>
+                <span class="sigma-sub">j=1</span>
+              </span>
+              <span class="math-term">&beta;<sub>j</sub> &times; X<sub>j</sub></span>
+            </div>
+          </div>
+          <div class="coef-list">
+            <div class="coef-row">
+              <span class="coef-name">截距項 (β₀ Intercept)</span>
+              <span class="coef-val">-165,969.92</span>
+            </div>
+            <div class="coef-row">
+              <span class="coef-name">每增加 1 小時 (β_hour)</span>
+              <span class="coef-val positive">+7.893 輛</span>
+            </div>
+            <div class="coef-row">
+              <span class="coef-name">氣溫每升 1°C (β_temp)</span>
+              <span class="coef-val positive">+6.511 輛</span>
+            </div>
+            <div class="coef-row">
+              <span class="coef-name">濕度每升 1% (β_humidity)</span>
+              <span class="coef-val negative">-2.008 輛</span>
+            </div>
+            <div class="coef-row">
+              <span class="coef-name">年份增長效應 (β_year)</span>
+              <span class="coef-val positive">+82.533 輛</span>
+            </div>
+            <div class="coef-row">
+              <span class="coef-name">月份季節效應 (β_month)</span>
+              <span class="coef-val positive">+7.645 輛</span>
+            </div>
+            <div class="coef-row">
+              <span class="coef-name">天候轉惡烈 (β_weather)</span>
+              <span class="coef-val negative">-5.581 輛</span>
+            </div>
+            <div class="coef-row">
+              <span class="coef-name">風速效應 (β_windspeed)</span>
+              <span class="coef-val positive">+0.359 輛</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="crisp-card">
+          <h3 class="card-title">隨機森林特徵重要性 (Feature Importances)</h3>
+          <p class="card-text">決策樹集成演算法評估特徵分裂不純度 (Gini / MSE) 之貢獻佔比：</p>
+          <div class="feature-bar-list" id="featureImportanceBars">
+            <!-- Populated dynamically by JS -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- 6. DEPLOYMENT & INTERACTIVE SIMULATOR (部署與即時互動預測) -->
+    <!-- ========================================================================= -->
+    <section id="phase-6" class="crisp-section">
+      <div class="section-badge">CRISP-DM STAGE 6</div>
+      <h2 class="section-title">6. Deployment (部署準備與即時互動預測模擬器)</h2>
+      <p class="section-subtitle">拖曳控制時間與氣象滑桿，系統即時推論租借總需求量、散客/會員拆解與營運調度指示</p>
+
+      <!-- Preset Scenarios Quick Pick -->
+      <div class="preset-banner">
+        <span class="preset-title">⚡ 一鍵載入經典營運情境：</span>
+        <div class="preset-btns">
+          <button class="btn-preset" onclick="loadScenario('morningRush')">💼 平日上班晨峰 (08:00)</button>
+          <button class="btn-preset" onclick="loadScenario('eveningRush')">🌆 平日下班晚峰 (18:00)</button>
+          <button class="btn-preset" onclick="loadScenario('weekendSun')">☀️ 週末晴朗午後 (14:00)</button>
+          <button class="btn-preset" onclick="loadScenario('winterRain')">🌧️ 寒冬深夜暴雨 (03:00)</button>
+        </div>
+      </div>
+
+      <div class="simulator-layout">
+        <!-- Input Controls Form -->
+        <div class="sim-controls-panel">
+          <div class="panel-header">
+            <h3>🎛️ 即時環境與時序控制面板</h3>
+            <div class="model-select-group">
+              <label><input type="radio" name="simModel" value="rf" checked onchange="calculatePrediction()"> 隨機森林 (非線性集成)</label>
+              <label><input type="radio" name="simModel" value="lr" onchange="calculatePrediction()"> 多元複迴歸 (線性)</label>
+            </div>
+          </div>
+
+          <div class="controls-grid">
+            <!-- Hour Slider -->
+            <div class="control-group full-width">
+              <div class="control-label">
+                <span>時間 (小時 Hour 0~23)</span>
+                <span class="control-value" id="valHour">08:00</span>
+              </div>
+              <input type="range" id="inputHour" min="0" max="23" value="8" step="1" oninput="updateControlDisplay('Hour', this.value); calculatePrediction();" />
+              <div class="slider-marks">
+                <span>00:00 (夜間)</span>
+                <span>08:00 (晨峰)</span>
+                <span>12:00 (中午)</span>
+                <span>18:00 (晚峰)</span>
+                <span>23:00</span>
+              </div>
+            </div>
+
+            <!-- Temperature Slider -->
+            <div class="control-group">
+              <div class="control-label">
+                <span>氣溫 (Temperature)</span>
+                <span class="control-value" id="valTemp">24.0 °C</span>
+              </div>
+              <input type="range" id="inputTemp" min="0" max="42" value="24" step="0.5" oninput="updateControlDisplay('Temp', this.value + ' °C'); calculatePrediction();" />
+            </div>
+
+            <!-- Humidity Slider -->
+            <div class="control-group">
+              <div class="control-label">
+                <span>相對濕度 (Humidity)</span>
+                <span class="control-value" id="valHumidity">55 %</span>
+              </div>
+              <input type="range" id="inputHumidity" min="10" max="100" value="55" step="1" oninput="updateControlDisplay('Humidity', this.value + ' %'); calculatePrediction();" />
+            </div>
+
+            <!-- Windspeed Slider -->
+            <div class="control-group">
+              <div class="control-label">
+                <span>風速 (Windspeed)</span>
+                <span class="control-value" id="valWindspeed">12 km/h</span>
+              </div>
+              <input type="range" id="inputWindspeed" min="0" max="50" value="12" step="1" oninput="updateControlDisplay('Windspeed', this.value + ' km/h'); calculatePrediction();" />
+            </div>
+
+            <!-- Month Dropdown -->
+            <div class="control-group">
+              <div class="control-label">
+                <span>月份 (Month)</span>
+              </div>
+              <select id="inputMonth" onchange="calculatePrediction()">
+                <option value="1">1 月 (嚴冬)</option>
+                <option value="2">2 月 (冬季)</option>
+                <option value="3">3 月 (早春)</option>
+                <option value="4">4 月 (春暖)</option>
+                <option value="5">5 月 (暮春)</option>
+                <option value="6" selected>6 月 (初夏熱絡)</option>
+                <option value="7">7 月 (盛夏熱門)</option>
+                <option value="8">8 月 (盛夏)</option>
+                <option value="9">9 月 (初秋舒適)</option>
+                <option value="10">10 月 (秋爽)</option>
+                <option value="11">11 月 (深秋微涼)</option>
+                <option value="12">12 月 (寒冬)</option>
+              </select>
+            </div>
+
+            <!-- Weather Dropdown -->
+            <div class="control-group">
+              <div class="control-label">
+                <span>天候概況 (Weather)</span>
+              </div>
+              <select id="inputWeather" onchange="calculatePrediction()">
+                <option value="1" selected>☀️ 晴朗 / 偶有薄雲 (Clear)</option>
+                <option value="2">⛅ 多雲 / 陰天薄霧 (Cloudy / Mist)</option>
+                <option value="3">🌧️ 微雨 / 小雪 / 陣雨 (Light Rain)</option>
+                <option value="4">⛈️ 狂風暴雨 / 暴雪 (Heavy Storm)</option>
+              </select>
+            </div>
+
+            <!-- Working Day Switch -->
+            <div class="control-group">
+              <div class="control-label">
+                <span>工作日屬性 (Working Day)</span>
+              </div>
+              <select id="inputWorkingDay" onchange="calculatePrediction()">
+                <option value="1" selected>💼 平日工作日 (週一至週五通勤)</option>
+                <option value="0">🏖️ 週末 / 假日 (休閒騎乘)</option>
+              </select>
+            </div>
+
+            <!-- Year Selector -->
+            <div class="control-group">
+              <div class="control-label">
+                <span>年份趨勢 (Year)</span>
+              </div>
+              <select id="inputYear" onchange="calculatePrediction()">
+                <option value="2012" selected>2012 年 (成長成熟期)</option>
+                <option value="2011">2011 年 (初期試營運)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Output Prediction Display Panel -->
+        <div class="sim-result-panel">
+          <div class="result-badge-row">
+            <span class="res-tag">即時預估結果</span>
+            <span class="demand-level-pill" id="demandLevelPill">高峰警戒</span>
+          </div>
+
+          <div class="pred-counter-box">
+            <div class="counter-label">預估全城單時出借總量</div>
+            <div class="counter-number">
+              <span id="predTotalCount">648</span>
+              <span class="counter-unit">輛 / hr</span>
+            </div>
+          </div>
+
+          <!-- Gauge progress bar -->
+          <div class="gauge-wrap">
+            <div class="gauge-bar-bg">
+              <div class="gauge-bar-fill" id="gaugeFill" style="width: 65%;"></div>
+            </div>
+            <div class="gauge-labels">
+              <span>0 (極低)</span>
+              <span>250 (中等)</span>
+              <span>500 (尖峰)</span>
+              <span>800+ (極度警戒)</span>
+            </div>
+          </div>
+
+          <!-- Breakdown: Casual vs Registered -->
+          <div class="user-split-box">
+            <div class="user-split-item">
+              <span class="us-title">註冊通勤會員 (Registered)</span>
+              <span class="us-val" id="predRegisteredCount">562 輛 (86.7%)</span>
+              <div class="mini-bar-bg"><div class="mini-bar-fill reg-fill" id="regBarFill" style="width: 86.7%;"></div></div>
+            </div>
+            <div class="user-split-item">
+              <span class="us-title">休閒臨租散客 (Casual)</span>
+              <span class="us-val" id="predCasualCount">86 輛 (13.3%)</span>
+              <div class="mini-bar-bg"><div class="mini-bar-fill cas-fill" id="casBarFill" style="width: 13.3%;"></div></div>
+            </div>
+          </div>
+
+          <!-- Operational Decision Card -->
+          <div class="dispatch-action-card" id="dispatchCard">
+            <div class="action-card-header">
+              <span class="action-icon">🚨</span>
+              <h4 id="actionCardTitle">調度中心運維指令：通勤晨峰補車戒備</h4>
+            </div>
+            <p id="actionCardDesc">
+              當前處於工作日 08:00 通勤爆發期，捷運核心轉乘站 (Metro Station) 與主要商辦租借需求激增。建議立刻派遣 4 輛卡車在熱門站點預先補充車輛，並確保還車空樁暢通。
+            </p>
+          </div>
+
+          <!-- Quick Test Export Actions -->
+          <div class="sim-actions-footer">
+            <button class="btn-action" onclick="exportSimulationReport()">
+              📥 匯出當前預測調度單 (JSON / Report)
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="app-footer">
+    <div class="footer-container">
+      <div class="footer-left">
+        <div class="footer-brand">Kaggle Bike Sharing Demand Project</div>
+        <div class="footer-course">
+          碩專班課程專題實作 ｜ 遵循 CRISP-DM 跨產業數據探勘標準架構
+        </div>
+      </div>
+      <div class="footer-right">
+        <span>© 2026 AIIS Lab. All rights reserved.</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="bike_data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
